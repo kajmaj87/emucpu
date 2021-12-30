@@ -6,3 +6,12 @@ set(CMAKE_CXX_STANDARD 20)
 include_directories(.)
 
 add_executable(emucpu emucpu.cpp)
+
+include(FetchContent)
+include(CTest)
+include(cmake/CPM.cmake)
+include(cmake/fetch-googletest.cmake)
+
+enable_testing()
+
+add_subdirectory(test)
