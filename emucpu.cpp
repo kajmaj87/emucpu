@@ -1,10 +1,11 @@
 #include <iostream>
 #include <cstddef>
+#include <array>
 
-constexpr uint16_t MAX_ADDRESS { 0xff };
+constexpr uint16_t MAX_ADDRESS { 0x0f };
 constexpr uint16_t REGISTERS { 8 };
 
-std::byte mem[MAX_ADDRESS] = {std::byte {0xff}};
+std::array<std::byte, MAX_ADDRESS> mem{std::byte {0xff}};
 uint16_t reg[REGISTERS] = {0};
 
 int pc = 0;
@@ -29,7 +30,7 @@ void process(std::byte opcode, std::byte v1, std::byte v2, std::byte v3){
      uint8_t register_number = std::to_integer<uint8_t>(v1);
      uint16_t value = to_word(v2, v3);
      reg[register_number] = value;
-     std::cout << "Loaded " << value << " to register " << register_number;
+     std::cout << "Loaded " << value << " to register " << register_number << "\n";
   }
 }
 
@@ -39,7 +40,7 @@ int main() {
       process(mem[pc], mem[pc+1], mem[pc+2], mem[pc+3]); 
       pc+=4;
     }
-    if (pc == MAX_ADDRESS) {
+    if (pc > MAX_ADDRESS) {
       std::cout << "Out of memory access!";
     }
     return 0;
