@@ -41,6 +41,13 @@ void process(std::byte opcode, std::byte v1, std::byte v2, std::byte v3){
   }
 }
 
+void print_registers(){
+  for (int i=0; i<8; i++){
+    std::cout << "r" << i << ": " << reg[i] << "\t";
+  }
+  std::cout << "\n";
+}
+
 int main() {
     initialize_memory();
     load_program();
@@ -49,8 +56,9 @@ int main() {
       pc+=4;
     }
     if (pc > MAX_ADDRESS) {
-      std::cout << "Out of memory access!";
+      std::cout << "Out of memory access!" << "\n";
     }
+    print_registers();
     return 0;
 }
 
