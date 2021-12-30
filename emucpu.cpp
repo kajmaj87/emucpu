@@ -34,18 +34,17 @@ void process(const std::byte opcode, const std::byte v1, const std::byte v2, con
      uint8_t register_number = std::to_integer<uint8_t>(v1);
      uint16_t value = to_word(v2, v3);
      reg[register_number] = value;
-     std::cout << "Loaded " << value << " to register " << unsigned(register_number) << "\n";
+     std::printf("Loaded %d to r%d\n", value, register_number);
   }
   if (opcode == std::byte{0xff}) {
-     std::cout << "Uninitialized memory access!\n";
+     std::printf("Uninitialized memory access!\n");
   }
 };
 
 void print_registers() {
   for (int i=0; i<8; i++){
-    std::cout << "r" << i << ": " << reg[i] << "\t";
+    std::printf("r%d: %4d (0x%04x)\n", i, reg[i], reg[i]);
   }
-  std::cout << "\n";
 };
 
 void print_memory() {
@@ -65,7 +64,7 @@ int main() {
       pc+=4;
     }
     if (pc > MAX_ADDRESS) {
-      std::cout << "Out of memory access!" << "\n";
+      std::printf("Out of memory access!");
     }
     print_registers();
     print_memory();
