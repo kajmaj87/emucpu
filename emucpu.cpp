@@ -5,10 +5,14 @@
 constexpr uint16_t MAX_ADDRESS { 0x0f };
 constexpr uint16_t REGISTERS { 8 };
 
-std::array<std::byte, MAX_ADDRESS> mem{std::byte {0xff}};
+std::array<std::byte, MAX_ADDRESS> mem;
 uint16_t reg[REGISTERS] = {0};
 
 int pc = 0;
+
+void initialize_memory(){
+  mem.fill(std::byte{0xff});
+}
 
 void load_program(){
   mem[0] = std::byte { 0x00 };
@@ -32,9 +36,13 @@ void process(std::byte opcode, std::byte v1, std::byte v2, std::byte v3){
      reg[register_number] = value;
      std::cout << "Loaded " << value << " to register " << register_number << "\n";
   }
+  if (opcode == std::byte{0xff}) {
+     std::cout << "Uninitialized memory access!\n";
+  }
 }
 
 int main() {
+    initialize_memory();
     load_program();
     while(pc < MAX_ADDRESS) {
       process(mem[pc], mem[pc+1], mem[pc+2], mem[pc+3]); 
