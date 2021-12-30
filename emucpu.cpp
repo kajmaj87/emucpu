@@ -34,7 +34,7 @@ void process(std::byte opcode, std::byte v1, std::byte v2, std::byte v3){
      uint8_t register_number = std::to_integer<uint8_t>(v1);
      uint16_t value = to_word(v2, v3);
      reg[register_number] = value;
-     std::cout << "Loaded " << value << " to register " << register_number << "\n";
+     std::cout << "Loaded " << value << " to register " << unsigned(register_number) << "\n";
   }
   if (opcode == std::byte{0xff}) {
      std::cout << "Uninitialized memory access!\n";
