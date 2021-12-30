@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/test_emucpu.dir/test_emucpu.cpp.o -o test_emucpu  ../lib/libgtest.a -lpthread 
