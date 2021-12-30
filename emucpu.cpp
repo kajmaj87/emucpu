@@ -6,7 +6,6 @@ constexpr uint16_t TOTAL_MEMORY { 0x10 };
 constexpr uint16_t MAX_ADDRESS { TOTAL_MEMORY - 1 };
 constexpr uint16_t REGISTERS { 8 };
 
-enum Opcode { LOAD = 0x00, STORE = 0x10, UNINITIALIZED = 0xff };
 
 std::array<std::byte, TOTAL_MEMORY> mem;
 uint16_t reg[REGISTERS] = {0};
@@ -17,19 +16,18 @@ void initialize_memory(){
   mem.fill(std::byte{0xff});
 };
 
+enum Opcode: uint8_t { LOAD = 0x00, STORE = 0x10, READ = 0x20, ADD = 0x30, JMP = 0xa0, JEZ = 0xa1, UNINITIALIZED = 0xff };
+
 void load_program(){
-  mem[0] = std::byte {LOAD};
-  mem[1] = std::byte { 0x01 };
-  mem[2] = std::byte { 0x10 };
-  mem[3] = std::byte { 0xa0 };
-  mem[4] = std::byte {LOAD};
-  mem[5] = std::byte { 0x02 };
-  mem[6] = std::byte { 0x01 };
-  mem[7] = std::byte { 0x00 };
-  mem[8] = std::byte {STORE};
-  mem[9] = std::byte { 0x01 };
-  mem[10] = std::byte { 0x00 };
-  mem[11] = std::byte { 0x0e };
+  constexpr uint8_t program[] = { 
+    LOAD, 0x00, 0x00, 0x05, // n in fib(n)
+    LOAD, 0x01, 0x00, 0x00, // f(0)
+    LOAD, 0x02, 0x00, 0x01  // f(1)
+  };
+
+  for (int i=0; i<std::size(program); i++){
+    mem[i] = std::byte {program[i]};
+  }
 };
 
 constexpr uint16_t to_word(const std::byte upper, const std::byte lower) {
@@ -85,7 +83,7 @@ int main() {
       pc+=4;
     }
     if (pc > MAX_ADDRESS) {
-      std::printf("Out of memory access!");
+      std::printf("Out of memory access!\n");
     }
     print_registers();
     print_memory();
