@@ -2,7 +2,7 @@
 #include <cstddef>
 #include <array>
 
-constexpr uint16_t MAX_ADDRESS { 0x0f };
+constexpr uint16_t MAX_ADDRESS { 0x10 };
 constexpr uint16_t REGISTERS { 8 };
 
 std::array<std::byte, MAX_ADDRESS> mem;
@@ -10,11 +10,11 @@ uint16_t reg[REGISTERS] = {0};
 
 int pc = 0;
 
-void initialize_memory(){
+constexpr auto initialize_memory = [] {
   mem.fill(std::byte{0xff});
-}
+};
 
-void load_program(){
+constexpr auto load_program = [] {
   mem[0] = std::byte { 0x00 };
   mem[1] = std::byte { 0x01 };
   mem[2] = std::byte { 0x00 };
@@ -23,13 +23,13 @@ void load_program(){
   mem[5] = std::byte { 0x02 };
   mem[6] = std::byte { 0x12 };
   mem[7] = std::byte { 0x0f };
-}
+};
 
-uint16_t to_word(std::byte upper, std::byte lower){
+constexpr auto to_word = [] (const std::byte upper, const std::byte lower) -> uint16_t {
   return (std::to_integer<uint8_t>(upper) << 8) | std::to_integer<uint8_t>(lower);
-}
+};
 
-void process(std::byte opcode, std::byte v1, std::byte v2, std::byte v3){
+constexpr auto process = [] (const std::byte opcode, const std::byte v1, const std::byte v2, const std::byte v3){
   if (opcode == std::byte{0x00}) {
      uint8_t register_number = std::to_integer<uint8_t>(v1);
      uint16_t value = to_word(v2, v3);
@@ -39,14 +39,23 @@ void process(std::byte opcode, std::byte v1, std::byte v2, std::byte v3){
   if (opcode == std::byte{0xff}) {
      std::cout << "Uninitialized memory access!\n";
   }
-}
+};
 
-void print_registers(){
+constexpr auto print_registers = [] {
   for (int i=0; i<8; i++){
     std::cout << "r" << i << ": " << reg[i] << "\t";
   }
   std::cout << "\n";
-}
+};
+
+constexpr auto print_memory = [] {
+  for (int i=0; i<MAX_ADDRESS; i++){
+    std::printf("%02x ", unsigned(mem[i]));
+    if (i % 4 == 3) {
+      std::printf("\n");
+    }
+  }
+};
 
 int main() {
     initialize_memory();
@@ -59,6 +68,7 @@ int main() {
       std::cout << "Out of memory access!" << "\n";
     }
     print_registers();
+    print_memory();
     return 0;
 }
 
