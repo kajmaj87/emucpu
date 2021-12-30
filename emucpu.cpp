@@ -2,12 +2,13 @@
 #include <cstddef>
 #include <array>
 
-constexpr uint16_t MAX_ADDRESS { 0x10 };
+constexpr uint16_t TOTAL_MEMORY { 0x10 };
+constexpr uint16_t MAX_ADDRESS { TOTAL_MEMORY - 1 };
 constexpr uint16_t REGISTERS { 8 };
 
 enum Opcode { LOAD = 0x00, STORE = 0x10, UNINITIALIZED = 0xff };
 
-std::array<std::byte, MAX_ADDRESS> mem;
+std::array<std::byte, TOTAL_MEMORY> mem;
 uint16_t reg[REGISTERS] = {0};
 
 int pc = 0;
@@ -19,7 +20,7 @@ void initialize_memory(){
 void load_program(){
   mem[0] = std::byte {LOAD};
   mem[1] = std::byte { 0x01 };
-  mem[2] = std::byte { 0x00 };
+  mem[2] = std::byte { 0x10 };
   mem[3] = std::byte { 0xa0 };
   mem[4] = std::byte {LOAD};
   mem[5] = std::byte { 0x02 };
@@ -28,7 +29,7 @@ void load_program(){
   mem[8] = std::byte {STORE};
   mem[9] = std::byte { 0x01 };
   mem[10] = std::byte { 0x00 };
-  mem[11] = std::byte { 0x0f };
+  mem[11] = std::byte { 0x0e };
 };
 
 constexpr uint16_t to_word(const std::byte upper, const std::byte lower) {
@@ -45,8 +46,13 @@ void process(const std::byte opcode, const std::byte v1, const std::byte v2, con
   if (opcode == std::byte{ STORE }) {
      uint8_t register_number = std::to_integer<uint8_t>(v1);
      uint16_t memory_address = to_word(v2, v3);
-     mem[memory_address] = std::byte(reg[register_number]);
-     std::printf("Stored %d (%02x) under memory address %04x\n", reg[register_number], reg[register_number], memory_address);
+     if (memory_address < MAX_ADDRESS) {
+       mem[memory_address] = std::byte(reg[register_number] >> 8);
+       mem[memory_address + 1] = std::byte(reg[register_number]);
+       std::printf("Stored %d (%02x) under memory address %04x-%04x\n", reg[register_number], reg[register_number], memory_address, memory_address + 1);
+     } else {
+       std::printf("Attempted to store %d (%02x) under address %04x-%04x but max adress is %04x\n", reg[register_number], reg[register_number], memory_address, memory_address+1, MAX_ADDRESS);
+     }
   }
   if (opcode == std::byte{ UNINITIALIZED }) {
      std::printf("Uninitialized memory access!\n");
@@ -60,7 +66,7 @@ void print_registers() {
 };
 
 void print_memory() {
-  for (int i=0; i<MAX_ADDRESS; i++){
+  for (int i=0; i<TOTAL_MEMORY; i++){
     if (i % 4 == 0) {
       std::printf("%04x-%04x: ", i, i + 3);
     }
