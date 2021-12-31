@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 include_directories(.)
 
-add_executable(emucpu emucpu.cpp)
+add_executable(emucpu main.cpp)
 
 include(FetchContent)
 include(CTest)

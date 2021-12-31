@@ -1,2 +1,4 @@
 .ccls-cache
 build/
+compile_commands.json
+neovim.json
