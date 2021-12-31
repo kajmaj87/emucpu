@@ -10,6 +10,7 @@ protected:
 
 TEST_F(EmucpuTest, load_to_all_registers) {
   for (uint8_t i = 0; i < 8; i++) {
+    Emucpu e;
     e.process({LOAD, i, 0x00, 0x01});
     ASSERT_EQ(e.reg[i], 0x01);
   }
@@ -66,6 +67,18 @@ TEST_F(EmucpuTest, dec_register) {
   ASSERT_EQ(e.reg[R0], 0x100f);
 }
 
+TEST_F(EmucpuTest, jz_should_not_jump_when_register_is_not_zero) {
+  e.reg[R0] = 0x1;
+  e.process({JZ, R0, 0x00, 0x20});
+  ASSERT_EQ(e.reg[PC], 0x04);
+}
+
+TEST_F(EmucpuTest, jz_should_jump_when_register_is_zero_to_small_address) {
+  e.reg[R0] = 0x0;
+  e.process({JZ, R0, 0x00, 0x20});
+  ASSERT_EQ(e.reg[PC], 0x0020);
+}
+
 TEST_F(EmucpuTest, jnz_should_not_jump_when_register_is_zero) {
   e.reg[R0] = 0x0;
   e.process({JNZ, R0, 0x10, 0x20});
@@ -78,8 +91,22 @@ TEST_F(EmucpuTest, jnz_should_jump_when_register_is_not_zero_to_small_address) {
   ASSERT_EQ(e.reg[PC], 0x0020);
 }
 
+TEST_F(EmucpuTest, should_calculate_fibonnaci_correctly) {
+  int fib[] = {0, 1, 1, 2, 3, 5, 8, 13, 21};
+  for (uint8_t i = 0; i <= 8; i++) {
+    Emucpu e;
+    const std::vector<Instruction> fibonacci{
+        {LOAD, R0, 0x00, i},    // n in fib(n)
+        {LOAD, R1, 0x00, 0x00}, // f(0)
+        {LOAD, R2, 0x00, 0x01}, // f(1)
+        {JZ, R0, 0x00, 28},     {ADD, R1, R1, R2},  {SWAP, R1, R2, NOOP},
+        {DEC, R0, NOOP, NOOP},  {JNZ, R0, 0x00, 16}};
+    e.execute(fibonacci);
+    ASSERT_EQ(e.reg[R1], fib[i]) << "Fib[" << i << "] is " << fib[i];
+  }
+}
+
 int main(int ac, char *av[]) {
     testing::InitGoogleTest(&ac, av);
     return RUN_ALL_TESTS();
 }
-

@@ -14,7 +14,7 @@ enum Opcode : uint8_t {
   DEC = 0x51,
   SWAP = 0x90,
   JMP = 0xa0,
-  JEZ = 0xa1,
+  JZ = 0xa1,
   JNZ = 0xa2,
   NOOP = 0xfe,
   UNINITIALIZED = 0xff
@@ -96,6 +96,20 @@ public:
       std::printf("Decreased R%d to (%d 0x%04x)\n", a, reg[a], reg[a]);
       break;
     }
+    case JZ: {
+      uint8_t a = inst.v1;
+      if (reg[a] == 0) {
+        if (inst.v2 > 0) {
+          std::printf("WARNING! JZ not implemented for adresses above 256!\n");
+        }
+        uint8_t b = inst.v3;
+        std::printf("Jumping from %d (0x%04x) to %d (0x%04x)\n", reg[PC],
+                    reg[PC], b, b);
+        reg[PC] =
+            b - 4; // adjust for program counter being moved after each inst
+      }
+      break;
+    }
     case JNZ: {
       uint8_t a = inst.v1;
       if (reg[a] != 0) {
@@ -142,7 +156,8 @@ public:
       }
     }
   };
-  void execute() {
+  void execute(const std::vector<Instruction> program) {
+    load_program(program);
     while (reg[PC] < MAX_ADDRESS) {
       struct Instruction i;
       i.op = static_cast<Opcode>(mem[reg[PC]]);
