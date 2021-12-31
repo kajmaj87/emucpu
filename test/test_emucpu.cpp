@@ -93,9 +93,9 @@ TEST_F(EmucpuTest, jnz_should_jump_when_register_is_not_zero_to_small_address) {
 
 TEST_F(EmucpuTest, should_calculate_fibonnaci_correctly) {
   int fib[] = {0, 1, 1, 2, 3, 5, 8, 13, 21};
-  for (uint8_t i = 0; i <= 8; i++) {
+  for (uint8_t i = 0; i <= 7; i++) {
     Emucpu e;
-    const std::vector<Instruction> fibonacci{
+    std::vector<Instruction> fibonacci{
         {LOAD, R0, 0x00, i},    // n in fib(n)
         {LOAD, R1, 0x00, 0x00}, // f(0)
         {LOAD, R2, 0x00, 0x01}, // f(1)

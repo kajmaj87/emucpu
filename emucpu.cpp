@@ -1,7 +1,7 @@
 #include <array>
 #include <cstddef>
 #include <iostream>
-#include <vector>
+#include <span>
 
 enum Register : uint8_t { R0, R1, R2, R3, R4, R5, R6, R7, PC };
 
@@ -131,7 +131,7 @@ public:
     }
     reg[PC] += 4;
   };
-  void load_program(const std::vector<Instruction> program) {
+  void load_program(const std::span<Instruction> program) {
     for (int i = 0; i < std::size(program); i++) {
       mem[4 * i] = std::byte{program[i].op};
       mem[4 * i + 1] = std::byte{program[i].v1};
@@ -156,7 +156,7 @@ public:
       }
     }
   };
-  void execute(const std::vector<Instruction> program) {
+  void execute(const std::span<Instruction> program) {
     load_program(program);
     while (reg[PC] < MAX_ADDRESS) {
       struct Instruction i;
