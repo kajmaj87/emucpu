@@ -5,7 +5,7 @@ const std::vector<Instruction> fibonacci{
     {LOAD, R1, 0x00, 0x00}, // f(0)
     {LOAD, R2, 0x00, 0x01}, // f(1)
     {ADD, R1, R1, R2},      {SWAP, R1, R2, NOOP},
-    {DEC, R0, NOOP, NOOP},  {JNZ, R0, 0x00, 8}};
+    {DEC, R0, NOOP, NOOP},  {JNZ, R0, 0x00, 12}};
 
 int main() {
   Emucpu emu;

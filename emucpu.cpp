@@ -32,11 +32,10 @@ class Emucpu {
   constexpr static uint16_t TOTAL_MEMORY{0x20};
   constexpr static uint16_t MAX_ADDRESS{
       static_cast<uint16_t>(TOTAL_MEMORY - 1)};
-  constexpr static uint16_t REGISTERS{8};
+  constexpr static uint16_t REGISTERS{9};
 
 public:
   uint16_t reg[REGISTERS] = {0};
-  int pc = 0;
   std::array<std::byte, TOTAL_MEMORY> mem;
 
   constexpr uint16_t to_word(const uint8_t upper, const uint8_t lower) {
@@ -104,8 +103,10 @@ public:
           std::printf("WARNING! JEZ not implemented for adresses above 256!\n");
         }
         uint8_t b = inst.v3;
-        std::printf("Jumping from %d (0x%04x) to %d (0x%04x)\n", pc, pc, b, b);
-        pc = b;
+        std::printf("Jumping from %d (0x%04x) to %d (0x%04x)\n", reg[PC],
+                    reg[PC], b, b);
+        reg[PC] =
+            b - 4; // adjust for program counter being moved after each inst
       }
       break;
     }
@@ -114,7 +115,7 @@ public:
       break;
     }
     }
-    pc += 4;
+    reg[PC] += 4;
   };
   void load_program(const std::vector<Instruction> program) {
     for (int i = 0; i < std::size(program); i++) {
@@ -142,15 +143,15 @@ public:
     }
   };
   void execute() {
-    while (pc < MAX_ADDRESS) {
+    while (reg[PC] < MAX_ADDRESS) {
       struct Instruction i;
-      i.op = static_cast<Opcode>(mem[pc]);
-      i.v1 = static_cast<uint8_t>(mem[pc + 1]);
-      i.v2 = static_cast<uint8_t>(mem[pc + 2]);
-      i.v3 = static_cast<uint8_t>(mem[pc + 3]);
+      i.op = static_cast<Opcode>(mem[reg[PC]]);
+      i.v1 = static_cast<uint8_t>(mem[reg[PC] + 1]);
+      i.v2 = static_cast<uint8_t>(mem[reg[PC] + 2]);
+      i.v3 = static_cast<uint8_t>(mem[reg[PC] + 3]);
       process(i);
     }
-    if (pc > MAX_ADDRESS) {
+    if (reg[PC] > MAX_ADDRESS) {
       std::printf("Out of memory access!\n");
     }
   }
@@ -158,5 +159,10 @@ public:
     print_registers();
     print_memory();
   }
+  uint8_t lookup(uint16_t index) { return static_cast<uint8_t>(mem[index]); }
+  uint16_t lookup2b(uint16_t index) {
+    return to_word(lookup(index), lookup(index + 1));
+  }
+
   Emucpu() { mem.fill(std::byte{0xff}); };
 };
