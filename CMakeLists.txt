@@ -11,7 +11,9 @@ include(FetchContent)
 include(CTest)
 include(cmake/CPM.cmake)
 include(cmake/fetch-googletest.cmake)
+include(cmake/fetch-fmt.cmake)
 
 enable_testing()
 
 add_subdirectory(test)
+add_subdirectory(lib)
