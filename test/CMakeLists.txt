@@ -1,3 +1,6 @@
 add_executable(test_emucpu test_emucpu.cpp)
+add_executable(test_compiler_integration test_compiler_integration.cpp)
 target_link_libraries(test_emucpu gtest)
+target_link_libraries(test_compiler_integration gtest parser compiler emucpu)
 add_test(Emucpu-Test test_emucpu)
+add_test(Compiler-Integration-Test test_compiler_integration)
