@@ -6,6 +6,7 @@
 #include <string>
 
 std::string line;
+std::vector<std::string> assembly;
 uint8_t pos;
 char current;
 char next;
@@ -40,10 +41,13 @@ void match(char c) {
 
 void emit(std::string str) { printf("\t%s", str.c_str()); }
 
-void emit_ln(std::string str) { emit(str.append("\n")); }
+void emit_ln(std::string str) {
+  emit(str.append("\n"));
+  assembly.push_back(str);
+}
 
 void term() {
-  std::string str = "MOVE R0 ";
+  std::string str = "LOAD R0 ";
   str += get_num();
   emit_ln(str);
 }
@@ -86,9 +90,11 @@ void init_for_next_line(std::string next_line) {
   current = NULL;
 }
 
-std::vector<std::string> Parser::parse(std::span<std::string> lines) {
+const std::vector<std::string>
+Parser::parse(const std::span<std::string> &lines) {
   for (auto current_line : lines) {
     init_for_next_line(current_line);
     expression();
   }
+  return assembly;
 }

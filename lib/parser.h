@@ -8,7 +8,7 @@
 class Parser {
 
 public:
-  std::vector<std::string> parse(std::span<std::string> lines);
+  const std::vector<std::string> parse(const std::span<std::string> &lines);
 };
 
 #endif

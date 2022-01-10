@@ -10,6 +10,14 @@ void Emucpu::process(const Instruction inst) {
     std::printf("Loaded %d to r%d\n", value, register_number);
     break;
   }
+  case MOVE: {
+    uint8_t a = inst.v1;
+    uint8_t b = inst.v2;
+    reg[a] = reg[b];
+    std::printf("Moved R%d (%d 0x%04x) R%d (%d 0x%04x)\n", b, reg[b], reg[b], a,
+                reg[a], reg[a]);
+    break;
+  }
   case STORE: {
     uint8_t register_number = inst.v1;
     uint16_t memory_address = to_word(inst.v2, inst.v3);
@@ -37,6 +45,18 @@ void Emucpu::process(const Instruction inst) {
     std::printf(
         "Added %d (0x%04x) to %d (0x%04x)  and saved in R%d -> %d 0x%04x\n",
         old_a, old_a, old_b, old_b, result, reg[result], reg[result]);
+    break;
+  }
+  case SUB: {
+    uint8_t result = inst.v1;
+    uint8_t a = inst.v2;
+    uint8_t b = inst.v3;
+    auto old_a = reg[a];
+    auto old_b = reg[b];
+    reg[result] = reg[a] - reg[b];
+    std::printf("Subtracted %d (0x%04x) from %d (0x%04x)  and saved in R%d -> "
+                "%d 0x%04x\n",
+                old_b, old_b, old_a, old_a, result, reg[result], reg[result]);
     break;
   }
   case SWAP: {
@@ -83,6 +103,10 @@ void Emucpu::process(const Instruction inst) {
   }
   case UNINITIALIZED: {
     std::printf("Uninitialized memory access!\n");
+    break;
+  }
+  default: {
+    std::printf("Unrecognized instruction: 0x%02x\n", inst.op);
     break;
   }
   }

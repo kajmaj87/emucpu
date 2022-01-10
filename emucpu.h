@@ -9,6 +9,7 @@ enum Register : uint8_t { R0, R1, R2, R3, R4, R5, R6, R7, PC };
 
 enum Opcode : uint8_t {
   LOAD = 0x00,
+  MOVE = 0x01,
   STORE = 0x10,
   READ = 0x20,
   ADD = 0x30,

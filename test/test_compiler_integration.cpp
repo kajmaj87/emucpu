@@ -12,10 +12,15 @@ protected:
   Parser p;
 };
 
-uint16_t compile_and_execute(std::string line, Compiler c, Parser p, Emucpu e) {
+uint16_t compile_and_execute(const std::string &line, Compiler &c, Parser &p,
+                             Emucpu &e) {
   std::vector<std::string> lines = {line};
   auto assembly = p.parse(lines);
+  for (auto as : assembly) {
+    printf("Instr: %s", as.c_str());
+  }
   auto bytecode = c.compile(assembly);
+  printf("Compilation successful\n");
   e.execute(bytecode);
   return e.reg[0];
 }
@@ -25,12 +30,13 @@ uint16_t compile_and_execute(std::string line, Compiler c, Parser p, Emucpu e) {
 /* } */
 
 /* TEST_F(CompilerTest, multiple_additions) { */
-/*   ASSERT_EQ(10, compile_and_execute("1+2+3+4", c, p, e)); */
+/*   ASSERT_EQ(6, compile_and_execute("1+2+3", c, p, e)); */
+/*   /1* ASSERT_EQ(10, compile_and_execute("1+2+3+4", c, p, e)); *1/ */
 /* } */
 
-/* TEST_F(CompilerTest, simple_subtraction) { */
-/*   ASSERT_EQ(3, compile_and_execute("5-2", c, p, e)); */
-/* } */
+TEST_F(CompilerTest, simple_subtraction) {
+  ASSERT_EQ(3, compile_and_execute("5-2", c, p, e));
+}
 
 int main(int ac, char *av[]) {
     testing::InitGoogleTest(&ac, av);
